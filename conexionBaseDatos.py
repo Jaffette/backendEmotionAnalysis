@@ -109,22 +109,6 @@ def get_courses_student(identification):
         return 'An error occurred getting the courses %s' % error_courses_student
 
 
-def get_student_emotion(identification):
-    try:
-        cursor = cnxn.cursor()
-        cursor.execute("""EXEC get_emotions_student @identification = ?, @success = 0;""", identification)
-        courses = []
-        for res in cursor.fetchall():
-            course = {'emocion': res[0], 'curso': res[1], 'fecha': res[2].strftime("%y-%m-%d")}
-            courses.append(course)
-        cursor.close()
-        response = {'response': courses}
-        print(response)
-        res = json.dumps(response)
-        return res
-    except Exception as error_emotions_student:
-        return 'An error occurred getting the courses %s' % error_emotions_student
-
 
 def get_student_emotion(identification):
     try:
