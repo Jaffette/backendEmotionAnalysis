@@ -117,12 +117,12 @@ class EchoHandler(BaseHTTPRequestHandler):
                 emocion = fields.get('emocion')[0]
                 profesor_curso = fields.get('profesor')[0]
                 fecha = fields.get('fecha')[0]
-
-                response = conexionBaseDatos.register_emotions(emocion,id_student,profesor_curso,fecha)
+                course_id = fields.get('course_id')[0]
+                response = conexionBaseDatos.register_emotions(emocion,id_student,profesor_curso,course_id,fecha)
                 self.send_response(200, 'ok')
                 self.send_header('content-type', 'application/json')
                 self.end_headers()
-                self.wfile.write(rol.encode())
+                self.wfile.write(response.encode())
 
 
 def main():
