@@ -3,10 +3,13 @@ import cgi
 import conexionBaseDatos
 
 class echoHandler(BaseHTTPRequestHandler):
-    def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "*")
-        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
-        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+
+    def do_OPTIONS(self):
+        self.send_response(200, "ok")
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+
     def do_GET(self):
 
         ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
@@ -16,8 +19,10 @@ class echoHandler(BaseHTTPRequestHandler):
 
         if self.path.endswith('/getCursos'):
             response = conexionBaseDatos.get_courses()
-            self.send_response(200)
+            self.send_response(200,'ok')
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header('content-type', 'application/json')
+
             self.end_headers()
             self.wfile.write(response.encode())
 
