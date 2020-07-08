@@ -1,6 +1,7 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import cgi
 import conexionBaseDatos
+import json
 from urllib.parse import parse_qs
 
 
@@ -65,64 +66,75 @@ class EchoHandler(BaseHTTPRequestHandler):
     def do_POST(self):
 
         ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
-        pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
-        content_len = int(self.headers.get('content-length'))
-        pdict["CONTENT-LENGTH"] = content_len
+        length = int(self.headers.get('content-length'))
+        # refuse to receive non-json content
+
+        if ctype != 'application/json':
+            print("not a json")
+            self.send_response(400)
+            self.end_headers()
+            return
+
+        if self.path.endswith('/test'):
+            info_received = json.loads(self.rfile.read(length))
+            # add a property to the object, just to mess with data
+            info_received['received'] = 'ok'
+            # send the info_received back
+            self.send_response(200)
+            self.send_header('content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(info_received['received'].encode())
 
         if self.path.endswith('/iniciarSesion'):
-            if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict)  # En pdict se encuentran todos los atributos enviados
-                username = fields.get('username')[0]
-                password = fields.get('password')[0]
-                rol = conexionBaseDatos.get_users_login(username, password)
-                self.send_response(200)
-                self.send_header('content-type', 'application/json')
-                self.end_headers()
-                self.wfile.write(rol.encode())
+            info_received = json.loads(self.rfile.read(length))
+            username = info_received['username']
+            password = info_received['password']
+            rol = conexionBaseDatos.get_users_login(username, password)
+            self.send_response(200)
+            self.send_header('content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(rol.encode())
 
         if self.path.endswith('/registro'):
-            if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict)  # En pdict se encuentran todos los atributos enviados
-                username = fields.get('username')[0]
-                password = fields.get('password')[0]
-                identification = fields.get('identification')[0]
-                name = fields.get('name')[0]
-                last_name = fields.get('last_name')[0]
-                phone_number = fields.get('phone_number')[0]
-                rol = fields.get('rol')[0]
-                first_time = True
-                response = conexionBaseDatos.register_user(username, password, identification, name,
-                                                           last_name, phone_number, rol, first_time)
-                self.send_response(200)
-                self.send_header('content-type', 'text')
-                self.end_headers()
-                self.wfile.write(response.encode())
+            info_received = json.loads(self.rfile.read(length))
+            username = info_received['username']
+            password = info_received['password']
+            identification = info_received['identification']
+            name = info_received['name']
+            last_name = info_received['last_name']
+            phone_number = info_received['phone_number']
+            rol = info_received['rol']
+            first_time = True
+            response = conexionBaseDatos.register_user(username, password, identification, name,
+                                                       last_name, phone_number, rol, first_time)
+            self.send_response(200)
+            self.send_header('content-type', 'text')
+            self.end_headers()
+            self.wfile.write(response.encode())
 
         if self.path.endswith('/registrarProfesor'):
-            if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict)  # En pdict se encuentran todos los atributos enviados
-                identification = fields.get('identification')[0]
-                name = fields.get('name')[0]
-                last_name = fields.get('last_name')[0]
-                conexionBaseDatos.insert_professors(identification, name, last_name)
-                self.send_response(200)
-                self.send_header('content-type', 'text')
-                self.end_headers()
-                self.wfile.write('registrado'.encode())
+            info_received = json.loads(self.rfile.read(length))
+            identification = info_received['identification']
+            name = info_received['name']
+            last_name = info_received['last_name']
+            conexionBaseDatos.insert_professors(identification, name, last_name)
+            self.send_response(200)
+            self.send_header('content-type', 'text')
+            self.end_headers()
+            self.wfile.write('registrado'.encode())
 
         if self.path.endswith('/registrarEmociones'):
-            if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict)  # En pdict se encuentran todos los atributos enviados
-                id_student = fields.get('id_student')[0]
-                emocion = fields.get('emocion')[0]
-                profesor_curso = fields.get('profesor')[0]
-                fecha = fields.get('fecha')[0]
-                course_id = fields.get('course_id')[0]
-                response = conexionBaseDatos.register_emotions(emocion,id_student,profesor_curso,course_id,fecha)
-                self.send_response(200, 'ok')
-                self.send_header('content-type', 'application/json')
-                self.end_headers()
-                self.wfile.write(response.encode())
+            info_received = json.loads(self.rfile.read(length))
+            id_student = info_received['id_student']
+            emocion = info_received['emocion']
+            profesor_curso = info_received['profesor']
+            fecha = info_received['fecha']
+            course_id = info_received['course_id']
+            response = conexionBaseDatos.register_emotions(emocion,id_student,profesor_curso,course_id,fecha)
+            self.send_response(200, 'ok')
+            self.send_header('content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(response.encode())
 
 
 def main():
