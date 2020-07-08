@@ -213,7 +213,7 @@ BEGIN
 END
 GO
 -------------------------------------------------------------------------------------------------
-EXEC PROC get_courses_student
+CREATE PROC get_courses_student
 (
 	@identification  VARCHAR(10),
 	@success		 BIT OUTPUT
