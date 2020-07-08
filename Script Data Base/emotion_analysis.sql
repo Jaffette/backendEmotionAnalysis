@@ -223,7 +223,7 @@ BEGIN
 	BEGIN TRY
 		
 		SET @success = 1
-		SELECT courses.course_name, course_code, courses_students_professors.group_number
+		SELECT courses.course_name,courses.credits, course_code, courses_students_professors.group_number
 		FROM courses  INNER JOIN courses_students_professors 
 		ON (courses.course_id = courses_students_professors.course_id) INNER JOIN users 
 		ON (users.user_id = courses_students_professors.student_id) 

@@ -55,22 +55,6 @@ def get_courses():
         return 'An error occurred getting the courses %s' % error_courses
 
 
-def get_courses_student(identification):
-    try:
-        cursor = cnxn.cursor()
-        cursor.execute("""EXEC get_courses_student @identification = ?, @success = 0;""", identification)
-        courses = []
-        for res in cursor.fetchall():
-            course = {'nombre': res[0], 'codigo': res[1], 'GRUPO': res[2]}
-            courses.append(course)
-        cursor.close()
-        response = {'response': courses}
-        res = json.dumps(response)
-        return res
-    except Exception as error_courses_student:
-        return 'An error occurred getting the courses %s' % error_courses_student
-
-
 def insert_professors(identification, name, last_name):
     try:
         cursor = cnxn.cursor()
@@ -99,7 +83,7 @@ def get_courses_student(identification):
         cursor.execute("""EXEC get_courses_student @identification = ?, @success = 0;""", identification)
         courses = []
         for res in cursor.fetchall():
-            course = {'nombre': res[0], 'codigo': res[1], 'GRUPO': res[2]}
+            course = {'nombre': res[0], 'creditos':res[1], 'codigo': res[2], 'Grupo': res[2]}
             courses.append(course)
         cursor.close()
         response = {'response': courses}
@@ -107,7 +91,6 @@ def get_courses_student(identification):
         return res
     except Exception as error_courses_student:
         return 'An error occurred getting the courses %s' % error_courses_student
-
 
 
 def get_student_emotion(identification):
@@ -125,6 +108,7 @@ def get_student_emotion(identification):
         return res
     except Exception as error_emotions_course:
         return 'An error occurred getting the courses %s' % error_emotions_course
+
 
 def get_course_emotion(course):
     try:
@@ -159,11 +143,3 @@ def register_emotions(emocion,id_student,profesor_curso,course_id,fecha):
     except Exception as error_emotions_course:
         return 'An error occurred getting the emotions of a course %s' % error_emotions_course
 
-
-'''
-
-EXEC insert_courses_students_professors @student_id=1, @course_id=2, @professor_id=1, @group_number=51, @success=0;
-GO
-EXEC insert_emotions @emotion='Feliz',@date='2020-07-10',@student_id=1,@course_id = 1, @success = 0;
-GO
-'''
