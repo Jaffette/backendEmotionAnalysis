@@ -1,8 +1,10 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import cgi
 import conexionBaseDatos
+from urllib.parse import parse_qs
 
-class echoHandler(BaseHTTPRequestHandler):
+
+class EchoHandler(BaseHTTPRequestHandler):
 
     def do_OPTIONS(self):
         self.send_response(200, "ok")
@@ -10,57 +12,58 @@ class echoHandler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
 
+    def query_get(self, queryData, key, default=""):
+        """Helper for getting values from a pre-parsed query string"""
+        return queryData.get(key, [default])[0]
+
     def do_GET(self):
+        path, _, query_string = self.path.partition('?')
+        query = parse_qs(query_string)
+        response = None
+        print(u"[START]: Received GET for %s with query: %s" % (path, query))
 
-        ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
-        pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
-        content_len = int(self.headers.get('content-length'))
-        pdict["CONTENT-LENGTH"] = content_len
+        try:
+            if path == '/getCursos':
+                response = conexionBaseDatos.get_courses()
+                self.send_response(200, 'ok')
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header('content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(response.encode())
 
-        if self.path.endswith('/getCursos'):
-            response = conexionBaseDatos.get_courses()
-            self.send_response(200,'ok')
-            self.send_header("Access-Control-Allow-Origin", "*")
-            self.send_header('content-type', 'application/json')
-
-            self.end_headers()
-            self.wfile.write(response.encode())
-
-        if self.path.endswith('/getCursosEstudiate'):
-            if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict)  # En pdict se encuentran todos los atributos enviados
-                identification = fields.get('identification')[0]
+            if path == '/getCursosEstudiate':
+                identification = query['identification'][0]
                 response = conexionBaseDatos.get_courses_student(identification)
-                self.send_response(200)
+                self.send_response(200, 'ok')
+                self.send_header("Access-Control-Allow-Origin", "*")
                 self.send_header('content-type', 'application/json')
                 self.end_headers()
                 self.wfile.write(response.encode())
 
-        if self.path.endswith('/filtrarEstudiante'):
-            if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict)  # En pdict se encuentran todos los atributos enviados
-                identification = fields.get('identification')[0]
+            if path == '/filtrarEstudiante':
+                identification = query['identification'][0]
                 response = conexionBaseDatos.get_student_emotion(identification)
-                print(response)
-                self.send_response(200)
+                self.send_response(200, 'ok')
+                self.send_header("Access-Control-Allow-Origin", "*")
                 self.send_header('content-type', 'application/json')
                 self.end_headers()
                 self.wfile.write(response.encode())
 
-        if self.path.endswith('/getEmocionesCurso'):
-            if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict)  # En pdict se encuentran todos los atributos enviados
-                curso = fields.get('curso')[0]
+            if path == '/getEmocionesCurso':
+                curso = query['curso'][0]
                 response = conexionBaseDatos.get_course_emotion(curso)
                 print(response)
-                self.send_response(200)
+                self.send_response(200, 'ok')
+                self.send_header("Access-Control-Allow-Origin", "*")
                 self.send_header('content-type', 'application/json')
                 self.end_headers()
                 self.wfile.write(response.encode())
 
-
+        except Exception as err:
+            self.send_error(err)
 
     def do_POST(self):
+
         ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
         pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
         content_len = int(self.headers.get('content-length'))
@@ -68,7 +71,7 @@ class echoHandler(BaseHTTPRequestHandler):
 
         if self.path.endswith('/iniciarSesion'):
             if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict) #En pdict se encuentran todos los atributos enviados
+                fields = cgi.parse_multipart(self.rfile, pdict)  # En pdict se encuentran todos los atributos enviados
                 username = fields.get('username')[0]
                 password = fields.get('password')[0]
                 rol = conexionBaseDatos.get_users_login(username, password)
@@ -108,14 +111,13 @@ class echoHandler(BaseHTTPRequestHandler):
                 self.wfile.write('registrado'.encode())
 
 
-
-
 def main():
     PORT = 8080
     server_address = ('0.0.0.0', PORT)
-    server = HTTPServer(server_address, echoHandler)
-    print ('server running on port %s' %PORT)
+    server = HTTPServer(server_address, EchoHandler)
+    print('server running on port %s' % PORT)
     server.serve_forever()
+
 
 if __name__ == '__main__':
     main()
