@@ -143,6 +143,21 @@ def get_course_emotion(course):
         return 'An error occurred getting the emotions of a course %s' % error_emotions_course
 
 
+def register_emotions(emocion,id_student,profesor_curso,fecha):
+    try:
+        cursor = cnxn.cursor()
+        cursor.execute("""EXEC insert_emotions @emotion=?,@date=?,@student_id=?,@course_id = ?, @success = 0; @success = 0;""", emocion,fecha,id_student,profesor_curso,)
+        courses = []
+        for res in cursor.fetchall():
+            course = {'emocion': res[1], 'reincidencia': res[0], }
+            courses.append(course)
+        cursor.close()
+        response = {'response': courses}
+        print(response)
+        res = json.dumps(response)
+        return res
+    except Exception as error_emotions_course:
+        return 'An error occurred getting the emotions of a course %s' % error_emotions_course
 
 
 '''

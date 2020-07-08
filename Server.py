@@ -110,6 +110,20 @@ class EchoHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write('registrado'.encode())
 
+        if self.path.endswith('/registrarEmociones'):
+            if ctype == 'multipart/form-data':
+                fields = cgi.parse_multipart(self.rfile, pdict)  # En pdict se encuentran todos los atributos enviados
+                id_student = fields.get('id_student')[0]
+                emocion = fields.get('emocion')[0]
+                profesor_curso = fields.get('profesor')[0]
+                fecha = fields.get('fecha')[0]
+
+                response = conexionBaseDatos.register_emotions(emocion,id_student,profesor_curso,fecha)
+                self.send_response(200, 'ok')
+                self.send_header('content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(rol.encode())
+
 
 def main():
     PORT = 8080
