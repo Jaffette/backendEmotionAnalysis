@@ -32,6 +32,14 @@ class EchoHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(response.encode())
 
+            if path == '/getProfessors':
+                response = conexionBaseDatos.get_professors()
+                self.send_response(200, 'ok')
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header('content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(response.encode())
+
             if path == '/getCursosEstudiante':
                 identification = query['identification'][0]
                 response = conexionBaseDatos.get_courses_student(identification)

@@ -26,6 +26,21 @@ def get_users_login(user, passw):
     except Exception as login_error:
         return 'An error occurred while loggin in %s' % login_error
 
+def get_professors():
+    try:
+        cursor = cnxn.cursor()
+        cursor.execute("""EXEC get_professors @success = 0;""")
+        professors = []
+        for res in cursor.fetchall():
+            course = {'id': res[0], 'identificacion': res[1], 'nombre': res[2], 'apellidos': res[3]}
+            professors.append(course)
+        cursor.close()
+        response = {'response': professors}
+        res = json.dumps(response)
+        return res
+
+    except Exception as error_professors:
+        return 'An error occurred getting the professors %s' % error_professors
 
 def register_user(user, passw, identification, name, last_name, phone_number, rol, first_time):
     try:
@@ -130,13 +145,10 @@ def get_course_emotion(course):
 def register_emotions(emocion,id_student,profesor_curso,course_id,fecha):
     try:
         cursor = cnxn.cursor()
-        cursor.execute("""EXEC insert_emotions @emotion=?,@date=?,@student_id=?,@course_id = ?, @success = 0;""", emocion, fecha, id_student, course_id, profesor_curso)
-        courses = []
-        for res in cursor.fetchall():
-            course = {'emocion': res[1], 'reincidencia': res[0], }
-            courses.append(course)
+        res = cursor.execute("""EXEC insert_emotions @emotion=?,@date=?,@student_id=?,@course_id = ?, @success = 0;""", emocion, fecha, id_student, course_id, profesor_curso)
+        cursor.commit()
         cursor.close()
-        response = {'response': courses}
+        response = {'response': res}
         print(response)
         res = json.dumps(response)
         return res
