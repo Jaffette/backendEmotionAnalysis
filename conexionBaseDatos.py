@@ -98,7 +98,7 @@ def get_courses_student(identification):
         cursor.execute("""EXEC get_courses_student @identification = ?, @success = 0;""", identification)
         courses = []
         for res in cursor.fetchall():
-            course = {'nombre': res[0], 'creditos':res[1], 'codigo': res[2], 'Grupo': res[2]}
+            course = {'nombre': res[0], 'creditos':res[1], 'codigo': res[2], 'Grupo': res[3]}
             courses.append(course)
         cursor.close()
         response = {'response': courses}

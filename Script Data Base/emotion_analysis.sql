@@ -281,7 +281,7 @@ BEGIN
 	END CATCH
 END
 GO
-
+------------------------------------------------------------------------------------
 CREATE PROC get_emotions_professor
 (
 	@professor     VARCHAR(100),
@@ -304,6 +304,15 @@ BEGIN
 	END CATCH
 END
 GO
+------------------------------------------------------------------------------------
+CREATE PROC get_professors
+@success BIT OUTPUT
+AS
+BEGIN
+	SET @success=1
+	SELECT * from professors;
+END
+GO
  ------------------------------------------------------------------------------------------------ PRUEBAS DE PROCEDURES -------------------------------------------------------------------------------------
 EXEC insert_users @username='jaffo98',@password='123',@identification= '0504200129',@name='Jaffette',@last_name='Solano Arias', @phone_number='72974674',@rol='E', @first_time=1, @success=0; 
 GO
@@ -324,6 +333,8 @@ GO
 EXEC get_emotions_course @course_name = 'es', @success = 0;
 GO
 EXEC get_emotions_professor @professor= 'Marv', @success = 0;
+GO
+EXEC get_professors @success = 0;
 GO
 
 SELECT * FROM users
