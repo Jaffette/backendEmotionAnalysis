@@ -32,7 +32,7 @@ class EchoHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(response.encode())
 
-            if path == '/getCursosEstudiate':
+            if path == '/getCursosEstudiante':
                 identification = query['identification'][0]
                 response = conexionBaseDatos.get_courses_student(identification)
                 self.send_response(200, 'ok')
@@ -74,16 +74,6 @@ class EchoHandler(BaseHTTPRequestHandler):
             self.send_response(400)
             self.end_headers()
             return
-
-        if self.path.endswith('/test'):
-            info_received = json.loads(self.rfile.read(length))
-            # add a property to the object, just to mess with data
-            info_received['received'] = 'ok'
-            # send the info_received back
-            self.send_response(200)
-            self.send_header('content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(info_received['received'].encode())
 
         if self.path.endswith('/iniciarSesion'):
             info_received = json.loads(self.rfile.read(length))
