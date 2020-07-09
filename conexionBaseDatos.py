@@ -26,6 +26,7 @@ def get_users_login(user, passw):
     except Exception as login_error:
         return 'An error occurred while loggin in %s' % login_error
 
+
 def get_professors():
     try:
         cursor = cnxn.cursor()
@@ -41,6 +42,7 @@ def get_professors():
 
     except Exception as error_professors:
         return 'An error occurred getting the professors %s' % error_professors
+
 
 def register_user(user, passw, identification, name, last_name, phone_number, rol, first_time):
     try:
@@ -98,7 +100,7 @@ def get_courses_student(identification):
         cursor.execute("""EXEC get_courses_student @identification = ?, @success = 0;""", identification)
         courses = []
         for res in cursor.fetchall():
-            course = {'nombre': res[0], 'creditos':res[1], 'codigo': res[1], 'Grupo': res[3]}
+            course = {'nombre': res[0], 'creditos': res[1], 'codigo': res[1], 'Grupo': res[3]}
             courses.append(course)
         cursor.close()
         response = {'response': courses}
@@ -142,10 +144,11 @@ def get_course_emotion(course):
         return 'An error occurred getting the emotions of a course %s' % error_emotions_course
 
 
-def register_emotions(emocion,id_student,profesor_curso,course_id,fecha):
+def register_emotions(emocion, id_student, profesor_curso, course_id, fecha):
     try:
         cursor = cnxn.cursor()
-        res = cursor.execute("""EXEC insert_emotions @emotion=?,@date=?,@student_id=?,@course_id = ?, @success = 0;""", emocion, fecha, id_student, course_id, profesor_curso)
+        res = cursor.execute("""EXEC insert_emotions @emotion=?,@date=?,@student_id=?,@course_id = ?, @success = 0;""",
+                             emocion, fecha, id_student, course_id, profesor_curso)
         cursor.commit()
         cursor.close()
         response = {'response': res}
@@ -155,3 +158,17 @@ def register_emotions(emocion,id_student,profesor_curso,course_id,fecha):
     except Exception as error_emotions_course:
         return 'An error occurred getting the emotions of a course %s' % error_emotions_course
 
+
+def insert_courses_students_professors(student_id, course_id, professor_id, group_number):
+    try:
+        cursor = cnxn.cursor()
+        res = cursor.execute("""EXEC insert_courses_students_professors @student_id=?, @course_id=?, @professor_id=?, 
+        @group_number=?, @success=0;""", student_id, course_id, professor_id, group_number)
+        cursor.commit()
+        cursor.close()
+        response = {'response': res}
+        print(response)
+        res = json.dumps(response)
+        return res
+    except Exception as error_inserting:
+        return 'An error occurred getting the emotions of a course %s' % error_inserting

@@ -134,6 +134,18 @@ class EchoHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(response.encode())
 
+        if self.path.endswith('/registrarCursoEstudiante'):
+            info_received = json.loads(self.rfile.read(length))
+            student_id = info_received['student_id']
+            course_id = info_received['course_id']
+            professor_id = info_received['professor_id']
+            group_number = info_received['group_number']
+
+            response = conexionBaseDatos.register_emotions(student_id, course_id, professor_id, group_number)
+            self.send_response(200, 'ok')
+            self.send_header('content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(response.encode())
 
 def main():
     PORT = 8080
