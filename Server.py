@@ -102,6 +102,8 @@ class EchoHandler(BaseHTTPRequestHandler):
 
         if self.path.endswith('/registro'):
             info_received = json.loads(self.rfile.read(length))
+            print(info_received)
+            #info_received = info_received['params']
             username = info_received['username']
             password = info_received['password']
             identification = info_received['identification']

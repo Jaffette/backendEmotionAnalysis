@@ -4,7 +4,7 @@ import json
 server_address = 'localhost\sqlexpress'
 database = 'emotion_analysis'
 username = 'sa'
-password = '1234'
+password = '12345'
 
 try:
     cnxn = pyodbc.connect(
@@ -51,7 +51,10 @@ def register_user(user, passw, identification, name, last_name, phone_number, ro
         @phone_number=?, @rol=?, @first_time=?, @success=0;""",
                        user, passw, identification, name, last_name, phone_number, rol, first_time)
         cursor.commit()
+        response = {'response': "ok"}
+        res = json.dumps(response)
         cursor.close()
+        return res
     except Exception as error_register_users:
         return 'An error occurred while registering %s' % error_register_users
 
