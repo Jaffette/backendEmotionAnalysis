@@ -103,10 +103,11 @@ def get_courses_student(identification):
         cursor.execute("""EXEC get_courses_student @identification = ?, @success = 0;""", identification)
         courses = []
         for res in cursor.fetchall():
-            course = {'nombre': res[0], 'creditos': res[1], 'codigo': res[1], 'Grupo': res[3]}
+            course = {'nombre': res[0], 'creditos': res[1], 'codigo': res[2], 'grupo': res[3]}
             courses.append(course)
         cursor.close()
         response = {'response': courses}
+        print(response)
         res = json.dumps(response)
         return res
     except Exception as error_courses_student:
