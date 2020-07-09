@@ -162,13 +162,13 @@ def register_emotions(emocion, id_student, profesor_curso, course_id, fecha):
 def insert_courses_students_professors(student_id, course_id, professor_id, group_number):
     try:
         cursor = cnxn.cursor()
-        res = cursor.execute("""EXEC insert_courses_students_professors @student_id=?, @course_id=?, @professor_id=?, 
+        cursor.execute("""EXEC insert_courses_students_professors @student_id=?, @course_id=?, @professor_id=?, 
         @group_number=?, @success=0;""", student_id, course_id, professor_id, group_number)
         cursor.commit()
         cursor.close()
-        response = {'response': res}
+        response = {'response': 'ok'}
         print(response)
         res = json.dumps(response)
         return res
     except Exception as error_inserting:
-        return 'An error occurred getting the emotions of a course %s' % error_inserting
+        return 'An error occurred inserting the data %s' % error_inserting

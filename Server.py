@@ -7,11 +7,17 @@ from urllib.parse import parse_qs
 
 class EchoHandler(BaseHTTPRequestHandler):
 
+    def _send_cors_headers(self):
+        """ Sets headers required for CORS """
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "x-api-key,Content-Type")
+
     def do_OPTIONS(self):
-        self.send_response(200, "ok")
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+        self.send_response(200)
+        self._send_cors_headers()
+        self.end_headers()
+
 
     def query_get(self, queryData, key, default=""):
         """Helper for getting values from a pre-parsed query string"""
@@ -89,6 +95,7 @@ class EchoHandler(BaseHTTPRequestHandler):
             password = info_received['password']
             rol = conexionBaseDatos.get_users_login(username, password)
             self.send_response(200)
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header('content-type', 'application/json')
             self.end_headers()
             self.wfile.write(rol.encode())
@@ -106,6 +113,7 @@ class EchoHandler(BaseHTTPRequestHandler):
             response = conexionBaseDatos.register_user(username, password, identification, name,
                                                        last_name, phone_number, rol, first_time)
             self.send_response(200)
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header('content-type', 'text')
             self.end_headers()
             self.wfile.write(response.encode())
@@ -117,6 +125,7 @@ class EchoHandler(BaseHTTPRequestHandler):
             last_name = info_received['last_name']
             conexionBaseDatos.insert_professors(identification, name, last_name)
             self.send_response(200)
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header('content-type', 'text')
             self.end_headers()
             self.wfile.write('registrado'.encode())
@@ -130,6 +139,7 @@ class EchoHandler(BaseHTTPRequestHandler):
             course_id = info_received['course_id']
             response = conexionBaseDatos.register_emotions(emocion,id_student,profesor_curso,course_id,fecha)
             self.send_response(200, 'ok')
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header('content-type', 'application/json')
             self.end_headers()
             self.wfile.write(response.encode())
@@ -140,9 +150,9 @@ class EchoHandler(BaseHTTPRequestHandler):
             course_id = info_received['course_id']
             professor_id = info_received['professor_id']
             group_number = info_received['group_number']
-
-            response = conexionBaseDatos.register_emotions(student_id, course_id, professor_id, group_number)
+            response = conexionBaseDatos.insert_courses_students_professors(student_id, course_id, professor_id, group_number)
             self.send_response(200, 'ok')
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header('content-type', 'application/json')
             self.end_headers()
             self.wfile.write(response.encode())
