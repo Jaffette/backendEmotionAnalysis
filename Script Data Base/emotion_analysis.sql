@@ -207,7 +207,7 @@ BEGIN
 	IF EXISTS (SELECT * from users WHERE username = @username and password = @password)
 	BEGIN
 		SET @success = 1
-		SELECT rol, first_time from users where username = @username and password = @password
+		SELECT rol, identification, user_id, first_time from users where username = @username and password = @password
 	END
 	
 END

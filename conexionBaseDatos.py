@@ -20,7 +20,7 @@ def get_users_login(user, passw):
         cursor.execute("""EXEC users_login @username=?,  @password=?, @success=0;""", user, passw)
         rol = cursor.fetchone()
         cursor.close()
-        response = {"rol": rol[0], "first_time": rol[1]}
+        response = {"rol": rol[0], "identification": rol[1], "user_id": rol[2], "first_time": rol[3]}
         response = json.dumps(response)
         return response
     except Exception as login_error:
