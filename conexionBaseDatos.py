@@ -103,7 +103,7 @@ def get_courses_student(identification):
         cursor.execute("""EXEC get_courses_student @identification = ?, @success = 0;""", identification)
         courses = []
         for res in cursor.fetchall():
-            course = {'nombre': res[0], 'creditos': res[1], 'codigo': res[2], 'grupo': res[3]}
+            course = {'id':res[0], 'nombre': res[1], 'creditos': res[2], 'codigo': res[3], 'grupo': res[4]}
             courses.append(course)
         cursor.close()
         response = {'response': courses}
@@ -148,14 +148,14 @@ def get_course_emotion(course):
         return 'An error occurred getting the emotions of a course %s' % error_emotions_course
 
 
-def register_emotions(emocion, id_student, profesor_curso, course_id, fecha):
+def register_emotions(emocion,fecha, id_student, course_id):
     try:
         cursor = cnxn.cursor()
         res = cursor.execute("""EXEC insert_emotions @emotion=?,@date=?,@student_id=?,@course_id = ?, @success = 0;""",
-                             emocion, fecha, id_student, course_id, profesor_curso)
+                             emocion, fecha, id_student, course_id)
         cursor.commit()
         cursor.close()
-        response = {'response': res}
+        response = {'response': "ok"}
         print(response)
         res = json.dumps(response)
         return res

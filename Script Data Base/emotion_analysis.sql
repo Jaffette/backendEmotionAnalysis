@@ -59,7 +59,7 @@ GO
 CREATE TABLE emotions(
 	emotion_id         INT IDENTITY(1,1) NOT NULL,
 	emotion            VARCHAR(20)       NOT NULL,
-	date               DATETIME          NOT NULL,
+	date                VARCHAR(10)       NOT NULL,
 	student_id         INT               NOT NULL,
 	course_id          INT               NOT NULL,
 
@@ -162,10 +162,10 @@ BEGIN
 END 
 GO
 -------------------------------------------------------------------------------------------------
-CREATE PROC insert_emotions
+CREATE OR ALTER PROC insert_emotions
 ( 
-       @emotion                 VARCHAR(20) , 
-       @date                    DATETIME    , 
+     @emotion                 VARCHAR(20) , 
+     @date                    VARCHAR(10) , 
 	   @student_id              INT         , 
 	   @course_id               INT         ,
 	   @success					BIT OUTPUT    
@@ -213,7 +213,7 @@ BEGIN
 END
 GO
 -------------------------------------------------------------------------------------------------
-CREATE PROC get_courses_student
+CREATE OR ALTER PROC get_courses_student
 (
 	@identification  VARCHAR(10),
 	@success		 BIT OUTPUT
@@ -223,7 +223,7 @@ BEGIN
 	BEGIN TRY
 		
 		SET @success = 1
-		SELECT courses.course_name,courses.credits, course_code, courses_students_professors.group_number
+		SELECT courses.course_id, courses.course_name,courses.credits, course_code, courses_students_professors.group_number
 		FROM courses  INNER JOIN courses_students_professors 
 		ON (courses.course_id = courses_students_professors.course_id) INNER JOIN users 
 		ON (users.user_id = courses_students_professors.student_id) 
@@ -318,11 +318,11 @@ EXEC insert_users @username='jaffo98',@password='123',@identification= '05042001
 GO
 EXEC insert_profesors @identification='504200128', @name='Marvin', @last_name = 'Campos', @success=0;
 GO
-EXEC insert_courses @course_code='IC-1402',@course_name='Estructuras de Datos',@credits=4,@success=0;
+EXEC insert_courses @course_code='IC-1403',@course_name='POO',@credits=4,@success=0;
 GO
 EXEC insert_courses_students_professors @student_id=1, @course_id=1, @professor_id=1, @group_number=50, @success=0;
 GO
-EXEC insert_emotions @emotion='Feliz',@date='2020-07-10',@student_id=1,@course_id = 1, @success = 0;
+EXEC insert_emotions @emotion='Triste',@date='2020-07-10',@student_id=1,@course_id = 1, @success = 0;
 GO
 EXEC users_login @username='jaffo98',  @password='123', @success=1;
 GO
