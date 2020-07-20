@@ -3,7 +3,7 @@ import cgi
 import conexionBaseDatos
 import json
 from urllib.parse import parse_qs
-
+import datetime
 
 class EchoHandler(BaseHTTPRequestHandler):
 
@@ -101,6 +101,8 @@ class EchoHandler(BaseHTTPRequestHandler):
 
         if self.path.endswith('/registro'):
             info_received = json.loads(self.rfile.read(length))
+            print(info_received)
+            #info_received = info_received['params']
             username = info_received['username']
             password = info_received['password']
             identification = info_received['identification']
@@ -145,12 +147,16 @@ class EchoHandler(BaseHTTPRequestHandler):
 
         if self.path.endswith('/registrarEmociones'):
             info_received = json.loads(self.rfile.read(length))
-            id_student = info_received['id_student']
-            emocion = info_received['emocion']
-            profesor_curso = info_received['profesor']
-            fecha = info_received['fecha']
+            print(info_received)
+            student_id = info_received['student_id']
+            emotion = info_received['emotion']
             course_id = info_received['course_id']
-            response = conexionBaseDatos.register_emotions(emocion,id_student,profesor_curso,course_id,fecha)
+            fecha = info_received['fecha']
+            date_object = datetime.date.today()
+            print("tipo",type(fecha))
+            course_id = info_received['course_id']
+            response = conexionBaseDatos.register_emotions(emotion,fecha,student_id,course_id,)
+            
             self.send_response(200, 'ok')
             self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header('content-type', 'application/json')
@@ -159,6 +165,7 @@ class EchoHandler(BaseHTTPRequestHandler):
 
         if self.path.endswith('/registrarCursoEstudiante'):
             info_received = json.loads(self.rfile.read(length))
+            print("Aloha")
             student_id = info_received['student_id']
             course_id = info_received['course_id']
             professor_id = info_received['professor_id']
