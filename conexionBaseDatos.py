@@ -112,7 +112,7 @@ def get_courses_student(identification):
         cursor.execute("""EXEC get_courses_student @identification = ?, @success = 0;""", identification)
         courses = []
         for res in cursor.fetchall():
-            course = {'id':res[0], 'nombre': res[1], 'creditos': res[2], 'codigo': res[3], 'grupo': res[4]}
+            course = {'id': res[0], 'nombre': res[1], 'creditos': res[2], 'codigo': res[3], 'grupo': res[4]}
             courses.append(course)
         cursor.close()
         response = {'response': courses}
@@ -157,7 +157,7 @@ def get_course_emotion(course):
         return 'An error occurred getting the emotions of a course %s' % error_emotions_course
 
 
-def register_emotions(emocion,fecha, id_student, course_id):
+def register_emotions(emocion, fecha, id_student, course_id):
     try:
         cursor = cnxn.cursor()
         res = cursor.execute("""EXEC insert_emotions @emotion=?,@date=?,@student_id=?,@course_id = ?, @success = 0;""",
@@ -185,3 +185,38 @@ def insert_courses_students_professors(student_id, course_id, professor_id, grou
         return res
     except Exception as error_inserting:
         return 'An error occurred inserting the data %s' % error_inserting
+
+
+def get_avg_emotions_student(student_id, start_date, end_date):
+    try:
+        cursor = cnxn.cursor()
+        cursor.execute("""EXEC get_avg_emotions_student @student_id=?, @start_date=?, @end_date =?, @success=0;""",
+                       student_id, start_date, end_date)
+        courses = []
+        for res in cursor.fetchall():
+            course = {'emocion': res[0], 'reincidencia': res[1], }
+            courses.append(course)
+        cursor.close()
+        response = {'response': courses}
+        print(response)
+        res = json.dumps(response)
+        return res
+    except Exception as avg_emotions_student:
+        return 'An error occurred getting the avg of emotions of a student %s' % avg_emotions_student
+
+
+def get_avg_emotions_courses(course_name,start_date,end_date):
+    try:
+        cursor = cnxn.cursor()
+        cursor.execute("""EXEC get_avg_emotions_courses @course_name=?, @start_date=?, @end_date =?, @success=0;""", course_name,start_date,end_date)
+        courses = []
+        for res in cursor.fetchall():
+            course = {'emocion': res[0], 'reincidencia': res[1], }
+            courses.append(course)
+        cursor.close()
+        response = {'response': courses}
+        print(response)
+        res = json.dumps(response)
+        return res
+    except Exception as get_avg_emotions_courses:
+        return 'An error occurred getting the avg of emotions of a course %s' %get_avg_emotions_courses

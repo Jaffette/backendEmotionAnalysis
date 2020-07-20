@@ -18,7 +18,7 @@ CREATE TABLE users(
 	PRIMARY KEY(user_id),
 	CHECK  (identification LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
 	CHECK  (phone_number   LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]')
-); 
+);
 GO
 
 CREATE TABLE professors(
@@ -28,7 +28,7 @@ CREATE TABLE professors(
 	last_name       VARCHAR(100)      NOT NULL,
 
 	PRIMARY KEY(professor_id)
-); 
+);
 GO
 
 CREATE TABLE courses(
@@ -71,16 +71,16 @@ GO
 
 -------------------------------------------------------------------------------------------------
 CREATE PROC insert_users
-( 
-       @username                   VARCHAR(50)   , 
-       @password                   VARCHAR(50)   , 
-       @identification             VARCHAR(50)   , 
-       @name                       VARCHAR(50)   ,  
-	   @last_name                  VARCHAR(100)  , 
+(
+       @username                   VARCHAR(50)   ,
+       @password                   VARCHAR(50)   ,
+       @identification             VARCHAR(50)   ,
+       @name                       VARCHAR(50)   ,
+	   @last_name                  VARCHAR(100)  ,
 	   @phone_number               VARCHAR(9)    ,
 	   @rol						   CHAR(1)       ,
 	   @first_time                 BIT           ,
-	   @success					   BIT OUTPUT    
+	   @success					   BIT OUTPUT
 )
 
 AS
@@ -92,16 +92,16 @@ BEGIN
 	 BEGIN CATCH
 		SET @success = 0
 	END CATCH
-END 
+END
 GO
 
 -------------------------------------------------------------------------------------------------
 CREATE PROC insert_profesors
-( 
-       @identification             VARCHAR(9)   , 
-       @name                       VARCHAR(50)   ,  
-	   @last_name                  VARCHAR(100)  , 
-	   @success					   BIT OUTPUT    
+(
+       @identification             VARCHAR(9)   ,
+       @name                       VARCHAR(50)   ,
+	   @last_name                  VARCHAR(100)  ,
+	   @success					   BIT OUTPUT
 
 )
 
@@ -114,15 +114,15 @@ BEGIN
 	 BEGIN CATCH
 		SET @success = 0
 	END CATCH
-END 
+END
 GO
 -------------------------------------------------------------------------------------------------
 CREATE PROC insert_courses
-( 
-       @course_code             VARCHAR(10)   , 
-       @course_name             VARCHAR(100)  ,  
-	   @credits                 TINYINT       , 
-	   @success					BIT OUTPUT    
+(
+       @course_code             VARCHAR(10)   ,
+       @course_name             VARCHAR(100)  ,
+	   @credits                 TINYINT       ,
+	   @success					BIT OUTPUT
 
 )
 
@@ -135,16 +135,16 @@ BEGIN
 	 BEGIN CATCH
 		SET @success = 0
 	END CATCH
-END 
+END
 GO
 -------------------------------------------------------------------------------------------------
 CREATE PROC insert_courses_students_professors
-( 
-       @student_id              INT        , 
-       @course_id               INT        , 
-	   @professor_id            INT        , 
+(
+       @student_id              INT        ,
+       @course_id               INT        ,
+	   @professor_id            INT        ,
 	   @group_number            TINYINT    ,
-	   @success					BIT OUTPUT    
+	   @success					BIT OUTPUT
 
 )
 
@@ -158,17 +158,17 @@ BEGIN
 				END
 			ELSE
 				SET @success = 0
-			
-END 
+
+END
 GO
 -------------------------------------------------------------------------------------------------
 CREATE OR ALTER PROC insert_emotions
-( 
-     @emotion                 VARCHAR(20) , 
-     @date                    VARCHAR(10) , 
-	   @student_id              INT         , 
+(
+     @emotion                 VARCHAR(20) ,
+     @date                    VARCHAR(10) ,
+	   @student_id              INT         ,
 	   @course_id               INT         ,
-	   @success					BIT OUTPUT    
+	   @success					BIT OUTPUT
 
 )
 
@@ -181,8 +181,8 @@ BEGIN
 				END
 			ELSE
 				SET @success = 0
-			
-END 
+
+END
 GO
 
 -------------------------------------------------------------------------------------------------
@@ -209,7 +209,7 @@ BEGIN
 		SET @success = 1
 		SELECT rol, identification, user_id, first_time from users where username = @username and password = @password
 	END
-	
+
 END
 GO
 -------------------------------------------------------------------------------------------------
@@ -221,14 +221,14 @@ CREATE OR ALTER PROC get_courses_student
 AS
 BEGIN
 	BEGIN TRY
-		
+
 		SET @success = 1
 		SELECT courses.course_id, courses.course_name,courses.credits, course_code, courses_students_professors.group_number
-		FROM courses  INNER JOIN courses_students_professors 
-		ON (courses.course_id = courses_students_professors.course_id) INNER JOIN users 
-		ON (users.user_id = courses_students_professors.student_id) 
+		FROM courses  INNER JOIN courses_students_professors
+		ON (courses.course_id = courses_students_professors.course_id) INNER JOIN users
+		ON (users.user_id = courses_students_professors.student_id)
 		WHERE users.identification = @identification
-		
+
 	END TRY
 	BEGIN CATCH
 		SET @success = 0
@@ -244,14 +244,14 @@ CREATE PROC get_emotions_student
 AS
 BEGIN
 	BEGIN TRY
-		
+
 		SET @success = 1
 		SELECT emotions.emotion, courses.course_name, CAST(emotions.date AS DATE) AS date
-		FROM EMOTIONS INNER JOIN users 
-		ON (users.user_id = emotionS.student_id) INNER JOIN courses 
+		FROM EMOTIONS INNER JOIN users
+		ON (users.user_id = emotionS.student_id) INNER JOIN courses
 		ON (emotions.course_id = courses.course_id)
 		WHERE users.identification = @identification
-		
+
 	END TRY
 	BEGIN CATCH
 		SET @success = 0
@@ -267,14 +267,14 @@ CREATE PROC get_emotions_course
 AS
 BEGIN
 	BEGIN TRY
-		
+
 		SET @success = 1
 		SELECT count(emotions.emotion) as emotion_records, emotions.emotion
-		FROM EMOTIONS INNER JOIN users 
-		ON (users.user_id = emotionS.student_id) INNER JOIN courses 
+		FROM EMOTIONS INNER JOIN users
+		ON (users.user_id = emotionS.student_id) INNER JOIN courses
 		ON (emotions.course_id = courses.course_id)
 		WHERE courses.course_name LIKE @course_name+'%' GROUP BY emotions.emotion
-		
+
 	END TRY
 	BEGIN CATCH
 		SET @success = 0
@@ -290,14 +290,14 @@ CREATE PROC get_emotions_professor
 AS
 BEGIN
 	BEGIN TRY
-		
+
 		SET @success = 1
 		SELECT count( emotions.emotion)/2 as emotion_records, emotions.emotion
 		FROM emotions INNER JOIN courses_students_professors
-		ON (emotions.student_id = courses_students_professors.student_id) INNER JOIN professors 
+		ON (emotions.student_id = courses_students_professors.student_id) INNER JOIN professors
 		ON (courses_students_professors.professor_id = professors.professor_id)
 		WHERE professors.name LIKE @professor+'%' GROUP BY emotions.emotion
-		
+
 	END TRY
 	BEGIN CATCH
 		SET @success = 0
@@ -313,8 +313,57 @@ BEGIN
 	SELECT * from professors;
 END
 GO
+-------------------------------------------------------------------------------------------------
+CREATE PROC get_avg_emotions_student
+(
+	@student_id     VARCHAR(10),
+	@start_date     VARCHAR(10),
+	@end_date       VARCHAR(10),
+	@success		 BIT OUTPUT
+)
+AS
+BEGIN
+	BEGIN TRY
+
+		SET @success = 1
+		SELECT emotions.emotion,count(*) as Mayor
+		FROM emotions INNER JOIN users
+		ON (users.user_id = emotionS.student_id) INNER JOIN courses
+		ON (emotions.course_id = courses.course_id)
+		WHERE users.identification = @student_id and emotions.date between @start_date and 	@end_date GROUP BY emotions.emotion ORDER BY Mayor desc
+
+	END TRY
+	BEGIN CATCH
+		SET @success = 0
+	END CATCH
+END
+GO
+-------------------------------------------------------------------------------------------------
+CREATE PROC get_avg_emotions_courses
+(
+	@course_name     VARCHAR(10),
+	@start_date     VARCHAR(10),
+	@end_date       VARCHAR(10),
+	@success		 BIT OUTPUT
+)
+AS
+BEGIN
+	BEGIN TRY
+
+		SET @success = 1
+		SELECT emotions.emotion,count(*) as Mayor
+		FROM emotions INNER JOIN courses
+		ON (emotions.course_id = courses.course_id)
+		WHERE courses.course_name LIKE @course_name and emotions.date between @start_date and 	@end_date GROUP BY emotions.emotion ORDER BY Mayor desc
+
+	END TRY
+	BEGIN CATCH
+		SET @success = 0
+	END CATCH
+END
+GO
  ------------------------------------------------------------------------------------------------ PRUEBAS DE PROCEDURES -------------------------------------------------------------------------------------
-EXEC insert_users @username='jaffo98',@password='123',@identification= '0504200129',@name='Jaffette',@last_name='Solano Arias', @phone_number='72974674',@rol='E', @first_time=1, @success=0; 
+EXEC insert_users @username='jaffo98',@password='123',@identification= '0504200129',@name='Jaffette',@last_name='Solano Arias', @phone_number='72974674',@rol='E', @first_time=1, @success=0;
 GO
 EXEC insert_profesors @identification='504200128', @name='Marvin', @last_name = 'Campos', @success=0;
 GO
@@ -323,6 +372,16 @@ GO
 EXEC insert_courses_students_professors @student_id=1, @course_id=1, @professor_id=1, @group_number=50, @success=0;
 GO
 EXEC insert_emotions @emotion='Triste',@date='2020-07-10',@student_id=1,@course_id = 1, @success = 0;
+GO
+EXEC insert_emotions @emotion='Feliz',@date='2020-07-10',@student_id=1,@course_id = 1, @success = 0;
+GO
+EXEC insert_emotions @emotion='neutral',@date='2020-07-10',@student_id=1,@course_id = 1, @success = 0;
+GO
+EXEC insert_emotions @emotion='neutral',@date='2020-07-10',@student_id=1,@course_id = 1, @success = 0;
+GO
+EXEC insert_emotions @emotion='neutral',@date='2020-07-11',@student_id=1,@course_id = 1, @success = 0;
+GO
+EXEC insert_emotions @emotion='neutral',@date='2020-07-12',@student_id=1,@course_id = 1, @success = 0;
 GO
 EXEC users_login @username='jaffo98',  @password='123', @success=1;
 GO
@@ -336,6 +395,10 @@ EXEC get_emotions_professor @professor= 'Marv', @success = 0;
 GO
 EXEC get_professors @success = 0;
 GO
+EXEC  get_avg_emotions_student @student_id='0504200129', @start_date='2020-07-11', @end_date = '2020-07-12', @success=0;
+GO
+EXEC  get_avg_emotions_courses @course_name='POO', @start_date='2020-07-10', @end_date = '2020-07-12', @success=0;
+GO
 
 use emotion_analysis
 SELECT * FROM users
@@ -343,5 +406,6 @@ SELECT * FROM professors
 SELECT * FROM courses
 SELECT * FROM courses_students_professors
 SELECT * FROM emotions
+
 
 

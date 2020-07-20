@@ -74,6 +74,30 @@ class EchoHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(response.encode())
 
+            if path == '/get_avg_emotions_courses':
+                course = query['course'][0]
+                start_date = query['start'][0]
+                end_date = query['end'][0]
+                response = conexionBaseDatos.get_avg_emotions_courses(course,start_date,end_date)
+                print(response)
+                self.send_response(200, 'ok')
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header('content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(response.encode())
+
+            if path == '/get_avg_emotions_student':
+                student_id = query['student_id'][0]
+                start_date = query['start'][0]
+                end_date = query['end'][0]
+                response = conexionBaseDatos.get_avg_emotions_student(student_id,start_date,end_date)
+                print(response)
+                self.send_response(200, 'ok')
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header('content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(response.encode())
+
         except Exception as err:
             self.send_error(err)
 
