@@ -337,6 +337,7 @@ GO
 EXEC get_professors @success = 0;
 GO
 
+use emotion_analysis
 SELECT * FROM users
 SELECT * FROM professors
 SELECT * FROM courses

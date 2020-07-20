@@ -73,12 +73,17 @@ def get_courses():
 
 
 def insert_professors(identification, name, last_name):
+    print(identification, name, last_name)
     try:
         cursor = cnxn.cursor()
-        cursor.execute("""EXEC insert_professors @identification = ?, @name = ?, @last_name = ?, @success = 0;""",
+        cursor.execute("""EXEC insert_profesors @identification = ?, @name = ?, @last_name = ?, @success = 0;""",
                        identification, name, last_name)
         cursor.commit()
         cursor.close()
+        response = {'response': 'ok'}
+        print(response)
+        res = json.dumps(response)
+        return res
     except Exception as error_register_professor:
         return 'An error occurred while registering %s' % error_register_professor
 
@@ -90,6 +95,10 @@ def insert_courses(course_code, course_name, credits):
                        course_code, course_name, credits)
         cursor.commit()
         cursor.close()
+        response = {'response': 'ok'}
+        print(response)
+        res = json.dumps(response)
+        return res
     except Exception as error_register_professor:
         return 'An error occurred while registering %s' % error_register_professor
 

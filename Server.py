@@ -78,7 +78,6 @@ class EchoHandler(BaseHTTPRequestHandler):
             self.send_error(err)
 
     def do_POST(self):
-
         ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
         length = int(self.headers.get('content-length'))
         # refuse to receive non-json content
@@ -120,15 +119,29 @@ class EchoHandler(BaseHTTPRequestHandler):
 
         if self.path.endswith('/registrarProfesor'):
             info_received = json.loads(self.rfile.read(length))
+            print(info_received)
             identification = info_received['identification']
             name = info_received['name']
-            last_name = info_received['last_name']
-            conexionBaseDatos.insert_professors(identification, name, last_name)
+            last_name = info_received['lastname']
+            r = conexionBaseDatos.insert_professors(identification, name, last_name)
             self.send_response(200)
             self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header('content-type', 'text')
             self.end_headers()
-            self.wfile.write('registrado'.encode())
+            self.wfile.write(r.encode())
+
+        if self.path.endswith('/registrarCurso'):
+            info_received = json.loads(self.rfile.read(length))
+            code = info_received['code']
+            name = info_received['name']
+            credits = info_received['credits']
+            print(info_received)
+            r = conexionBaseDatos.insert_courses(code, name, credits)
+            self.send_response(200)
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header('content-type', 'text')
+            self.end_headers()
+            self.wfile.write(r.encode())
 
         if self.path.endswith('/registrarEmociones'):
             info_received = json.loads(self.rfile.read(length))
